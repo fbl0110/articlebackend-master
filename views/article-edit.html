@@ -13,13 +13,13 @@
         <!-- 头部 -->
         {{ include './common/header.html' }}
 
-        <!--左边侧边栏 -->
+        <!-- 左边侧边栏 -->
         {{ include './common/side.html' }}
 
         <div class="layui-body">
             <!-- 内容主体区域 -->
             <div style="padding: 15px;">
-                <h2 style="text-align: center; margin: 5px;">文章添加</h2>
+                <h2 style="text-align: center; margin: 5px;">文章编辑</h2>
                 <form class="layui-form" action="" lay-filter="formDemo">
                     <!-- 设置隐藏域，保存文件路径，便于提交到后台 -->
                     <input type="hidden" name="cover">
@@ -98,11 +98,20 @@
     {{ include './common/scriptjs.html' }}
     <script src="https://cdn.jsdelivr.net/npm/wangeditor@latest/dist/wangEditor.min.js"></script>
     <script>
+        // 
+        // 获取地址栏中的art_id的参数
+        let url = location.href;
+        let reg = /art_id=(.*)&?/;
+        // [...伪数组] =》 转化为真数组
+        // [,cat_id]： 解构：舍去第一个参数，要第二个参数
+        let [, art_id] = [...reg.exec(url)]
+
         const E = window.wangEditor
         const editor = new E('#content')
         editor.config.uploadImgShowBase64 = true; // 可以实现手动上传图片(转换成base64格式)
         editor.create()
-            //JavaScript代码区域
+
+        //JavaScript代码区域  
         layui.use(['element', 'form', 'layer', 'upload'], function() {
             var element = layui.element;
             var layer = layui.layer;
@@ -132,6 +141,8 @@
                     //请求异常回调
                 }
             });
+
+
 
             //监听提交
             // lay-filter="formDemo"
@@ -163,11 +174,39 @@
                         // optionStr是属于ajax动态生成的
                     $("#cat_id").html(optionStr);
                     form.render(); // 重新渲染
-
+                    // 等待分类加载成功之后，在获取当前文章的数据（要保证顺序）
+                    getEditArt();
 
                 }, 'json')
             }
             loadCate();
+
+            // 1在获取当前文章的数据
+            function getEditArt() {
+                // 发送ajax获取当前文章的数据,进行数据的表单回显
+                $.get('/getOneArt', {
+                    art_id
+                }, (res) => {
+                    console.log(res)
+                    let {
+                        title,
+                        content,
+                        status,
+                        cover,
+                        cat_id
+                    } = res;
+                    cover && $('#cover-preview').attr('src', cover)
+                    editor.txt.html(content)
+                        // 给表单赋值
+                    form.val('formDemo', {
+                        title,
+                        status,
+                        cat_id
+                    })
+                }, 'json')
+            }
+
+
 
         });
     </script>
