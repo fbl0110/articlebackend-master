@@ -13,7 +13,7 @@
         <!-- 头部 -->
         {{ include './common/header.html' }}
 
-        <!--左边侧边栏 -->
+        <!-- 引入左边侧边栏 -->
         {{ include './common/side.html' }}
 
         <div class="layui-body">
@@ -112,16 +112,14 @@
 
             //执行实例
             var uploadInst = upload.render({
-                elem: '#cover_img_upload' //绑定元素
+                elem: '#cover_img_upload' //绑定
                     ,
-                url: '/upload/' //上传接口
-                    ,
+                url: '/upload/',
                 done: function({
                     code,
                     message,
                     src
                 }) {
-                    //上传完毕回调
                     if (code == 0) {
                         // 1.图片预览 2.把图片路径设置到表单隐藏域提交到后台
                         $('#cover-preview').attr('src', src).css('width', '100')
@@ -134,7 +132,6 @@
             });
 
             //监听提交
-            // lay-filter="formDemo"
             form.on('submit(formDemo)', function(data) {
                 let formData = data.field;
                 formData.content = editor.txt.html(); //获取编辑器内容
@@ -157,10 +154,8 @@
 
                     let optionStr = `<option value=""></option>`;
                     res.forEach(v => {
-                            optionStr += `<option value="${v.cat_id}">${v.name}</option>`
-                        })
-                        // 赋值给下拉框select
-                        // optionStr是属于ajax动态生成的
+                        optionStr += `<option value="${v.cat_id}">${v.name}</option>`
+                    })
                     $("#cat_id").html(optionStr);
                     form.render(); // 重新渲染
 
@@ -168,7 +163,6 @@
                 }, 'json')
             }
             loadCate();
-
         });
     </script>
 </body>
